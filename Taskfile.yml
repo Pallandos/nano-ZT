@@ -1,0 +1,7 @@
+version: '3'
+
+tasks:
+  test:
+    desc: "Run configured tests"
+    cmds: 
+      - go test ./test/collectors -v
