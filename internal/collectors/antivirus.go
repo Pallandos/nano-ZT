@@ -72,3 +72,5 @@ func GetGlobalAntivirusHealth() (*AVHealth, error) {
 
 	return result, nil
 }
+
+//?: maybe check if a specific AV is installed and running

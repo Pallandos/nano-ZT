@@ -1,5 +1,8 @@
 package test
 
+//!: This should not be considered as a "test" file as it is just testing if the function works,
+//!: not its correctness
+
 import (
 	"fmt"
 	"testing"
