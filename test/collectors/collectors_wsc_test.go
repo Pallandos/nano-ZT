@@ -21,3 +21,15 @@ func TestCollectorsAV(t *testing.T) {
 		fmt.Printf("Description of AV : %s\n", avhealth.Description)
 	}
 }
+
+func TestCollectorsFW(t *testing.T) {
+	fwhealth, err := collectors.GetGlobalFirewallHealth()
+
+	if err != nil {
+		t.Errorf("Error: %s\n", err)
+	} else {
+		fmt.Printf("Is FW healthy : %t\n", fwhealth.IsHealthy)
+		fmt.Printf("Status of FW : %s\n", fwhealth.Status)
+		fmt.Printf("Description of FW : %s\n", fwhealth.Description)
+	}
+}

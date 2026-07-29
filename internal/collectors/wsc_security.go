@@ -1,5 +1,8 @@
 package collectors
 
+// This module uses the WSC security provider feature to collect informations relative to
+// security providers registered to Windows like firewall, AV, UAC ...
+
 import (
 	"fmt"
 	"unsafe"
@@ -9,7 +12,13 @@ import (
 
 // Constants from wscapi.h (windows doc)
 const (
-	WSC_SECURITY_PROVIDER_ANTIVIRUS = 0x4
+	WSC_SECURITY_PROVIDER_FIREWALL             = 0x1
+	WSC_SECURITY_PROVIDER_AUTOUPDATE_SETTINGS  = 0x2
+	WSC_SECURITY_PROVIDER_ANTIVIRUS            = 0x4
+	WSC_SECURITY_PROVIDER_ANTISPYWARE          = 0x8
+	WSC_SECURITY_PROVIDER_INTERNET_SETTINGS    = 0x10
+	WSC_SECURITY_PROVIDER_USER_ACCOUNT_CONTROL = 0x20
+	WSC_SECURITY_PROVIDER_SERVICE              = 0x40
 
 	WSC_SECURITY_PROVIDER_HEALTH_GOOD         = 0
 	WSC_SECURITY_PROVIDER_HEALTH_NOTMONITORED = 1
@@ -24,27 +33,28 @@ var (
 	procWscGetSecurityProviderHealth = modwscapi.NewProc("WscGetSecurityProviderHealth")
 )
 
-// Global state of protection
-type AVHealth struct {
+// SecurityHealth represents the global state of a generic protection provider
+type SecurityHealth struct {
 	IsHealthy   bool
 	Status      string
 	Description string
 }
 
-func GetGlobalAntivirusHealth() (*AVHealth, error) {
+// Generic internal function (non exported)
+func getSecurityProviderHealth(provider uint32) (*SecurityHealth, error) {
 	var health uint32
 
 	// System call
 	ret, _, errSys := procWscGetSecurityProviderHealth.Call(
-		uintptr(WSC_SECURITY_PROVIDER_ANTIVIRUS),
+		uintptr(provider),
 		uintptr(unsafe.Pointer(&health)), // Pointer
 	)
 
 	if ret != 0 {
-		return nil, fmt.Errorf("Fail to call API (HRESULT: 0x%x). System error: %v", ret, errSys)
+		return nil, fmt.Errorf("fail to call API (HRESULT: 0x%x). System error: %v", ret, errSys)
 	}
 
-	result := &AVHealth{}
+	result := &SecurityHealth{}
 
 	// Get and interpret result
 	switch health {
@@ -71,6 +81,16 @@ func GetGlobalAntivirusHealth() (*AVHealth, error) {
 	}
 
 	return result, nil
+}
+
+// GetGlobalAntivirusHealth checks the Antivirus status
+func GetGlobalAntivirusHealth() (*SecurityHealth, error) {
+	return getSecurityProviderHealth(WSC_SECURITY_PROVIDER_ANTIVIRUS)
+}
+
+// GetGlobalFirewallHealth checks the Firewall status
+func GetGlobalFirewallHealth() (*SecurityHealth, error) {
+	return getSecurityProviderHealth(WSC_SECURITY_PROVIDER_FIREWALL)
 }
 
 //?: maybe check if a specific AV is installed and running
