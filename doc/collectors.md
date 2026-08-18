@@ -33,3 +33,16 @@ type OSVersion struct {
 For example, the collector will return : 
 
     10.0.26200.8875 (25H2)
+
+## App version
+
+This collector returns information about any installed app, such as version and publisher. 
+
+```go
+type InstalledApp struct {
+	Name            string `json:"name"`
+	Version         string `json:"version"`
+	Publisher       string `json:"publisher"`
+	InstallLocation string `json:"install_location"`
+}
+```
