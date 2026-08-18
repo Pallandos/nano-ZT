@@ -1,1 +1,65 @@
-#TODO: config for trust thresolds 
+# Nano-ZT Trust Policy Configuration
+
+policy:
+  name: "Corporate Endpoint Zero-Trust Policy"
+  version: "1.0"
+
+  # OS Version Policy Rules
+  os_version:
+    enabled: true
+    min_major: 10
+    min_minor: 0
+    min_ubr: 1000                           # Minimum Update Build Revision (Security Patch level)
+    allowed_display_versions:               # Whitelist of allowed Windows commercial releases
+      - "22H2"
+      - "23H2"
+      - "24H2"
+      - "25H2"
+    excluded_builds:                        # Blacklist of prohibited Windows build numbers
+      - "10240"
+      - "10586"
+
+  # Security Providers Policy Rules (WSC Antivirus & Firewall)
+  security:
+    antivirus:
+      enabled: true
+      require_healthy: true                # Must have IsHealthy == true
+      allowed_statuses:                    # Whitelist of accepted health statuses
+        - "GOOD"
+      disallowed_statuses:                 # Blacklist of prohibited health statuses
+        - "POOR"
+        - "SNOOZE"
+        - "NOT_MONITORED"
+
+    firewall:
+      enabled: true
+      require_healthy: true
+      allowed_statuses:
+        - "GOOD"
+      disallowed_statuses:
+        - "POOR"
+        - "NOT_MONITORED"
+
+  # Application Compliance & Vulnerability Policy Rules
+  applications:
+    # Rule 1: Require Google Chrome with minimum version and excluded vulnerable versions
+    - name: "Google Chrome"
+      enabled: true
+      require_installed: true              # Application MUST be installed
+      min_version: "120.0.0.0"             # Minimum version threshold
+      excluded_versions:                   # Excluded / vulnerable version list
+        - "119.0.0.0"
+        - "118.0.5993.70"
+      expected_publisher: "Google LLC"
+      require_signed: true                 # Must have a valid Authenticode signature
+
+    # Rule 2: Require security agent (e.g. CrowdStrike Falcon Sensor)
+    - name: "CrowdStrike Falcon Sensor"
+      enabled: true
+      require_installed: true
+      require_signed: true
+
+    # Rule 3: Prohibit vulnerable or unwanted software
+    - name: "CCleaner"
+      enabled: true
+      disallowed: true                     # Prohibited - MUST NOT be installed
