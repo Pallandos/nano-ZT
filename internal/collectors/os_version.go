@@ -38,7 +38,7 @@ func GetOSVersion() (*OSVersion, error) {
 		info.Minor = minor
 	}
 
-	//!: CUrrentBuildNumber is stored as a string (why??)
+	//!: CurrentBuildNumber is stored as a string (why??)
 	build, _, err := k.GetStringValue("CurrentBuildNumber")
 	if err == nil {
 		info.Build = build
