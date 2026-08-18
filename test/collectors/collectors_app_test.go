@@ -12,7 +12,7 @@ import (
 
 func TestCollectorsAppVersion(t *testing.T) {
 	// Loose match demo
-	appName := "Windows"
+	appName := "Edge"
 	app, err := collectors.GetAppVersion(appName)
 
 	if err != nil {
@@ -24,8 +24,8 @@ func TestCollectorsAppVersion(t *testing.T) {
 
 func TestCollectorsAppVersionStrict(t *testing.T) {
 	// Strict match demo checking both exact name and expected publisher
-	appName := "Google Chrome"
-	publisher := "Google LLC"
+	appName := "Microsoft Edge"
+	publisher := "Microsoft Corporation"
 
 	app, err := collectors.GetAppVersionStrict(appName, publisher)
 
